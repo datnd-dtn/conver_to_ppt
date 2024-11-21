@@ -1,0 +1,51 @@
+{
+  "slide1": {
+    "content": "This presentation provides an overview of product performance, sales, and trends.",
+    "title": "Welcome to the Presentation"
+  },
+  "slide2": {
+    "imagePath": "https://www.dtn-e.com/wp-content/uploads/2022/03/logo-180x80.png",
+    "title": "Company Logo"
+  },
+  "slide3": {
+    "tableData": [
+      {
+        "Category": "Electronics",
+        "ID": "1",
+        "Name": "Product A",
+        "Revenue": 5000,
+        "Sales": 150
+      },
+      {
+        "Category": "Fashion",
+        "ID": "2",
+        "Name": "Product B",
+        "Revenue": 4500,
+        "Sales": 120
+      },
+      {
+        "Category": "Home Appliances",
+        "ID": "3",
+        "Name": "Product C",
+        "Revenue": 6000,
+        "Sales": 180
+      }
+    ],
+    "title": "Product Performance"
+  },
+  "slide4": {
+    "chartData": [
+      {
+        "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        "name": "Actual Sales",
+        "values": [1500, 4600, 5156, 3167, 8510, 8009, 6006, 7855, 12102, 12789, 10123, 15121]
+      },
+      {
+        "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        "name": "Projected Sales",
+        "values": [1000, 2600, 3456, 4567, 5010, 6009, 7006, 8855, 9102, 10789, 11123, 12121]
+      }
+    ],
+    "title": "Monthly Revenue"
+  }
+}

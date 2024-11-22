@@ -40,7 +40,6 @@ app.get("/generate", async (req, res) => {
 
     const pptx = new PptxGenJS();
     let yPosition = 1.5;
-    const lineSpacing = 0.3;
     const {
       features,
       cuttingAngles,
@@ -49,6 +48,7 @@ app.get("/generate", async (req, res) => {
       series,
       models,
       productName,
+      timeLine,
     } = slides[0];
 
     //define slide
@@ -64,17 +64,8 @@ app.get("/generate", async (req, res) => {
             x: 0,
             y: 0,
             w: "100%",
-            h: 1.2,
+            h: 1.1,
             fill: { color: "DB011C" },
-          },
-        },
-        {
-          rect: {
-            x: 1.6,
-            y: "92%",
-            w: 4.8,
-            h: 0.01,
-            fill: { color: "000000" },
           },
         },
         {
@@ -82,10 +73,11 @@ app.get("/generate", async (req, res) => {
             text: "Confidential document, property of TTI Group. For internal use only.",
             options: {
               x: 0.2,
-              y: "94%",
+              y: "96%",
               w: 5.5,
               h: 0.25,
-              fontSize: 6,
+              fontSize: 8,
+              fontFace: "Arial",
             },
           },
         },
@@ -93,9 +85,9 @@ app.get("/generate", async (req, res) => {
           image: {
             path: "https://stg.milwaukeetool.asia/media/wysiwyg/page/job-apply/title-logo.png",
             x: 0.25,
-            y: 0.3,
-            w: 1.2,
-            h: 0.7,
+            y: 0.2,
+            w: 1.4,
+            h: 0.8,
           },
         },
       ],
@@ -105,6 +97,7 @@ app.get("/generate", async (req, res) => {
 
     let startY = 1.4;
     let gap = 1.2;
+    //cuttingAngles
     JSON.parse(cuttingAngles).forEach((item, index) => {
       slide.addShape(pptx.ShapeType.rect, {
         x: 0.3,
@@ -125,64 +118,73 @@ app.get("/generate", async (req, res) => {
         x: 0.3,
         y: startY + index * gap + 1.1,
         w: 1.3,
-        fontSize: 6,
+        fontSize: 8,
         bold: true,
         color: "000000",
+        fontFace: "Arial",
         align: "center",
       });
     });
 
-    JSON.parse(features).forEach((feature) => {
-      let lines = [];
-      let text = feature;
-      while (text.length > 0) {
-        let line = text.substring(0, Math.min(4.8, text.length));
-        lines.push(line);
-        text = text.substring(line.length);
-      }
-
-      slide.addText(feature, {
-        x: 1.6,
-        y: yPosition,
-        w: 4.8,
-        fontSize: 7,
-        color: "000000",
-        fontFace: "Arial",
-      });
-
-      yPosition += lineSpacing;
+    //features
+    let text = JSON.parse(features)
+      .map((feature) => feature)
+      .join("\n");
+    slide.addText(text, {
+      x: 2,
+      y: 2.6,
+      w: 4.8,
+      fontSize: 10,
+      color: "000000",
+      fontFace: "Arial",
+      autoFit: true,
+      margin: [5, 5, 5, 5],
+      bullet: { code: "25CF" },
     });
 
+    //productName
     slide.addText(productName, {
       y: 0.4,
       w: "100%",
-      fontSize: 27,
+      fontSize: 32,
       color: "ffffff",
       align: "right",
-      fontFace: "Arial",
+      fontFace: "Arial Black",
     });
 
+    //series
     slide.addText(series, {
       y: 0.8,
       w: "100%",
-      fontSize: 17,
+      fontSize: 20,
       color: "ffffff",
       align: "right",
-      fontFace: "Arial",
+      fontFace: "Arial Black",
     });
 
+    //Time line
+    slide.addText(timeLine, {
+      y: 1.3,
+      w: "100%",
+      fontSize: 18,
+      color: "000000",
+      align: "right",
+      fontFace: "Arial Black",
+    });
+
+    //Main image
     slide.addImage({
       path: JSON.parse(image).url,
-      x: 6.4,
+      x: 7,
       y: 1.6,
-      w: 3,
-      h: 3,
+      w: 2.7,
+      h: 2.7,
       altText: JSON.parse(image).logo,
     });
 
     slide.addImage({
       path: JSON.parse(image).tag,
-      x: 6.4,
+      x: 6.8,
       y: 1.6,
       w: 1.2,
       h: 0.2,
@@ -198,14 +200,16 @@ app.get("/generate", async (req, res) => {
     });
 
     slide.addTable(JSON.parse(models), {
-      x: 1.6,
-      y: yPosition,
+      x: 2.1,
+      y: 3.9,
       w: 4.8,
       h: 1,
       colWidth: [2.5, 2, 2],
-      fontSize: 6,
+      fontSize: 9,
       align: "left",
       valign: "top",
+      fontFace: "Arial",
+      border: { pt: 1, color: "000000" },
     });
 
     const filePath = path.join(__dirname, "test.pptx");

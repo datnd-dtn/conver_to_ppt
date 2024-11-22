@@ -1,0 +1,47 @@
+{
+    "productName": "M12 FCS442",
+    "series": "M12 Fuel™ Sub Compact Circular Saw",
+    "quarter": "2024 Q3",
+    "features": [
+      "Redesigned brushless POWERSTATE™ motor for up to 25% increase in performance",
+      "Magnesium shoe reduces weight and maximises durability",
+      "Integrated dust blower keeps cut line clear",
+      "LED light illuminates the cut line for better visibility",
+      "Kitted with a DEK26 dust extraction adapter for a cleaner working environment",
+      "Maximum cutting depth of up to 46 mm with impressive power"
+    ],
+    "cuttingAngles": [
+      ["", "M12 FCS442-0", "M12 FCS442-502X"],
+      ["Kit included", "No batteries supplied, No charger supplied, No kitbox or bag supplied", "2 x M12 HB5 Battery packs, C12 C Charger, HD Box"],
+      ["Article Number", "4933493488", "4933493489"],
+      ["SSP Excl. VAT (€)", "299.00", "429.00"]
+    ],
+    "productDescription": "The DNA of our FUEL™ platform redefines the balance of cordless technologies with Milwaukee’s POWERSTATE™ brushless motor, REDLITHIUM™ battery pack and REDLINK PLUS™ electronic intelligence delivering outstanding power, run time and durability.",
+    "models": [
+      {
+        "model": "M12 FCS442-0",
+        "kitIncluded": "No batteries supplied, No charger supplied, No kitbox or bag supplied",
+        "articleNumber": "4933493488",
+        "price": "299.00",
+        "currency": "EUR"
+      },
+      {
+        "model": "M12 FCS442-502X",
+        "kitIncluded": "2 x M12 H5 Battery packs, C12 C Charger, HD Box",
+        "articleNumber": "4933493489",
+        "price": "429.00",
+        "currency": "EUR"
+      }
+    ],
+    "image": {
+      "url": "https://www.milwaukeetool.asia/media/catalog/product/cache/e399203ecf39df49f17fc7d52d521fa2/m/1/m18_fcs552--hero01.png",
+      "altText": "Milwaukee Logo",
+      "tag": "https://stg.milwaukeetool.co.jp/media/wysiwyg/product/system/M18.png"
+    },
+    "competitors": [],
+    "branding": {
+      "brand": "Milwaukee",
+      "logo": "https://www.milwaukeetool.asia/media/wysiwyg/page/m18-forge/M18_logo.png"
+    }
+  }
+  

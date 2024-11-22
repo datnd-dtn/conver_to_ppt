@@ -1,149 +1,184 @@
 import express from "express";
+import mysql from "mysql2";
 import PptxGenJS from "pptxgenjs";
-import admin from "firebase-admin";
 import path from "path";
-import { fileURLToPath } from "url";
 import { dirname } from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
 
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 4000;
+
+const connection = mysql.createConnection({
+  host: process.env.HOST_DB,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-import serviceAccount from "./demo16-7-firebase-adminsdk-k551k-32e2dc8eae.json" assert { type: "json" };
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://demo16-7-default-rtdb.firebaseio.com",
-});
-
-const app = express();
-const PORT = 3001;
+async function getData() {
+  return new Promise((resolve, reject) => {
+    connection.query("SELECT * FROM test", (err, results) => {
+      if (err) {
+        console.error("Error data:", err);
+        reject(err);
+      }
+      resolve(results);
+    });
+  });
+}
 
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/generate", async (req, res) => {
   try {
-    const db = admin.database();
-    const ref = db.ref("/");
-    const snapshot = await ref.once("value");
+    const slides = await getData();
 
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      const formattedData = Object.keys(data).map((key) => ({
-        title: key,
-        value: data,
-      }));
-      //   const {slide1, slide2, slide3, slide4} = data;
-      const pptx = new PptxGenJS();
-      let yPosition = 1.5;
+    const pptx = new PptxGenJS();
+    let yPosition = 1.5;
+    const lineSpacing = 0.4;
+    const {
+      features,
+      cuttingAngles,
+      branding,
+      image,
+      series,
+      models,
+      productName,
+    } = slides[0];
 
-      //define slide
-      pptx.defineSlideMaster({
-        title: "TEMPLATE_SLIDE",
-        margin: [0.5, 0.25, 1.0, 0.25],
-        background: {
-          path: "https://img.freepik.com/free-photo/colorful-background-with-alcohol-ink_24972-1282.jpg?t=st=1732087672~exp=1732091272~hmac=a529588749921bb82031ff0eed88f2f1b5a1db7106d589d16b09fb7da4529ccb&w=996",
-        },
-        objects: [
-          {
-            text: {
-              text: "DTN-solution",
-              options: {
-                x: 0,
-                y: 6.9,
-                w: "100%",
-                align: "center",
-                color: "000000",
-                fontSize: 12,
-              },
-            },
+    //define slide
+    pptx.defineSlideMaster({
+      title: "TEMPLATE_SLIDE",
+      margin: [0.5, 0.25, 1.0, 0.25],
+      background: {
+        color: "FFFFFF",
+      },
+      objects: [
+        {
+          rect: {
+            x: 0,
+            y: 0,
+            w: "100%",
+            h: 1.2,
+            fill: { color: "FF0000" },
           },
-          {
-            image: {
-              path: "https://www.dtn-e.com/wp-content/uploads/2022/03/logo-180x80.png",
-              x: 9,
-              y: 0.25,
-              w: 0.6,
-              h: 0.3,
-            },
-          },
-        ],
-        slideNumber: {
-          x: 8.0,
-          y: 7.0,
-          fontSize: 10,
-          color: "000000",
-          align: "center",
         },
-      });
+        {
+          text: {
+            text: "Confidential document, property of TTI Group. For internal use only.",
+            options: { x: 0.0, y: "94%", w: 5.5, h: 0.25, fontSize: 6 },
+          },
+        },
+        {
+          image: {
+            path: "https://stg.milwaukeetool.asia/media/wysiwyg/page/job-apply/title-logo.png",
+            x: 0.25,
+            y: 0.3,
+            w: 1.2,
+            h: 0.7,
+          },
+        },
+      ],
+    });
 
-      //Slide 1 Text
-      const slide1 = pptx.addSlide({ masterName: "TEMPLATE_SLIDE" });
-      const slide1Text = Object.entries(data.slide1).map(
-        ([key, value]) => `${value}`
-      );
-      slide1.addText(slide1Text.join("\n"), {
-        x: 0.5,
-        y: 0.5,
-        fontSize: 18,
+    const slide = pptx.addSlide({ masterName: "TEMPLATE_SLIDE" });
+
+    let startY = 1.4;
+    let gap = 1.2;
+    JSON.parse(cuttingAngles).forEach((item, index) => {
+      slide.addShape(pptx.ShapeType.rect, {
+        x: 0.3,
+        y: startY + index * gap,
+        w: 1.3,
+        h: 1,
+        line: { color: "000000", width: 1 },
+        fill: { color: "FFFFFF" },
+      });
+      slide.addImage({
+        path: item.img,
+        x: 0.3,
+        y: startY + index * gap,
+        w: 1.3,
+        h: 1,
+      });
+    });
+
+    JSON.parse(features).forEach((feature) => {
+      slide.addText(feature, {
+        x: 1.6,
+        y: yPosition,
+        w: 4.8,
+        fontSize: 8,
         color: "000000",
       });
 
-      //Slide 2 Image
-      const slide2 = pptx.addSlide({ masterName: "TEMPLATE_SLIDE" });
-      slide2.addText(data.slide2.title, {
-        x: 0.5,
-        y: 0.5,
-        fontSize: 18,
-        color: "000000",
-      });
-      slide2.addImage({ path: data.slide2.imagePath, x: 1, y: 1, w: 6, h: 3 });
+      yPosition += lineSpacing;
+    });
 
-      //Slide 3 Table
-      const slide3 = pptx.addSlide({ masterName: "TEMPLATE_SLIDE" });
-      const headerTable = Object.keys(data.slide3.tableData[0]);
-      const bodyTable = data.slide3.tableData.map((row) => Object.values(row));
-      const tableData = [headerTable, ...bodyTable];
-      console.log(tableData);
-      slide3.addText(data.slide3.title, {
-        x: 0.5,
-        y: 0.5,
-        fontSize: 18,
-        color: "000000",
-      });
-      slide3.addTable(tableData, {
-        x: 1,
-        y: 1,
-        w: 6,
-        border: { pt: 1, color: "000000" },
-        fill: "F4B183",
-        color: "000000",
-        fontSize: 14,
-      });
+    slide.addText(productName, {
+      y: 0.4,
+      w: "100%",
+      fontSize: 27,
+      color: "ffffff",
+      align: "right",
+    });
 
-      //Slide 4 Chart
-      const slide4 = pptx.addSlide({ masterName: "TEMPLATE_SLIDE" });
-      slide4.addText(data.slide4.title, {
-        x: 0.5,
-        y: 0.5,
-        fontSize: 18,
-        color: "000000",
-      });
-      slide4.addChart(pptx.ChartType.line, data.slide4.chartData, {
-        x: 1,
-        y: 1,
-        w: 8,
-        h: 4,
-      });
+    slide.addText(series, {
+      y: 0.8,
+      w: "100%",
+      fontSize: 17,
+      color: "ffffff",
+      align: "right",
+    });
 
-      const filePath = path.join(__dirname, "test.pptx");
-      await pptx.writeFile({ fileName: filePath });
+    slide.addImage({
+      path: JSON.parse(image).url,
+      x: 6.4,
+      y: 1.6,
+      w: 3,
+      h: 3,
+      altText: JSON.parse(image).logo,
+    });
 
-      res.download(filePath, "test.pptx");
-    } else {
-      res.status(404).send("No db");
-    }
+    slide.addImage({
+      path: JSON.parse(image).tag,
+      x: 6.4,
+      y: 1.6,
+      w: 1.2,
+      h: 0.2,
+    });
+
+    slide.addImage({
+      path: JSON.parse(branding).logo,
+      x: 1.3,
+      y: 0.8,
+      w: 0.4,
+      h: 0.2,
+      altText: JSON.parse(image).brand,
+    });
+
+    slide.addTable(JSON.parse(models), {
+      x: 1.6,
+      y: yPosition,
+      w: 4.8,
+      h: 1,
+      colWidth: [2.5, 2, 2],
+      fontSize: 6,
+      align: "left",
+      valign: "top",
+    });
+
+    const filePath = path.join(__dirname, "test.pptx");
+    await pptx.writeFile({ fileName: filePath });
+    res.download(filePath, "test.pptx");
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).send("Lỗi khi tạo PowerPoint");
+    res.status(500).send("Error create PowerPoint");
   }
 });
 

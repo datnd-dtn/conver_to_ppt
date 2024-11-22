@@ -40,7 +40,7 @@ app.get("/generate", async (req, res) => {
 
     const pptx = new PptxGenJS();
     let yPosition = 1.5;
-    const lineSpacing = 0.4;
+    const lineSpacing = 0.3;
     const {
       features,
       cuttingAngles,
@@ -65,13 +65,28 @@ app.get("/generate", async (req, res) => {
             y: 0,
             w: "100%",
             h: 1.2,
-            fill: { color: "FF0000" },
+            fill: { color: "DB011C" },
+          },
+        },
+        {
+          rect: {
+            x: 1.6,
+            y: "92%",
+            w: 4.8,
+            h: 0.01,
+            fill: { color: "000000" },
           },
         },
         {
           text: {
             text: "Confidential document, property of TTI Group. For internal use only.",
-            options: { x: 0.0, y: "94%", w: 5.5, h: 0.25, fontSize: 6 },
+            options: {
+              x: 0.2,
+              y: "94%",
+              w: 5.5,
+              h: 0.25,
+              fontSize: 6,
+            },
           },
         },
         {
@@ -106,15 +121,33 @@ app.get("/generate", async (req, res) => {
         w: 1.3,
         h: 1,
       });
+      slide.addText(`${item.angle} ${item.description}`, {
+        x: 0.3,
+        y: startY + index * gap + 1.1,
+        w: 1.3,
+        fontSize: 6,
+        bold: true,
+        color: "000000",
+        align: "center",
+      });
     });
 
     JSON.parse(features).forEach((feature) => {
+      let lines = [];
+      let text = feature;
+      while (text.length > 0) {
+        let line = text.substring(0, Math.min(4.8, text.length));
+        lines.push(line);
+        text = text.substring(line.length);
+      }
+
       slide.addText(feature, {
         x: 1.6,
         y: yPosition,
         w: 4.8,
-        fontSize: 8,
+        fontSize: 7,
         color: "000000",
+        fontFace: "Arial",
       });
 
       yPosition += lineSpacing;
@@ -126,6 +159,7 @@ app.get("/generate", async (req, res) => {
       fontSize: 27,
       color: "ffffff",
       align: "right",
+      fontFace: "Arial",
     });
 
     slide.addText(series, {
@@ -134,6 +168,7 @@ app.get("/generate", async (req, res) => {
       fontSize: 17,
       color: "ffffff",
       align: "right",
+      fontFace: "Arial",
     });
 
     slide.addImage({
